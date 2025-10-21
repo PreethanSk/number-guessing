@@ -1,16 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Three Digit Guessing Game</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Number Guessing Game</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="container">
-    <h1>🎯 Three Digit Number Guessing Game</h1>
-    <form method="POST">
-        <input type="text" name="name" placeholder="Enter your name" required>
-        <button type="submit">Start Game</button>
-    </form>
-</div>
+    <div class="container">
+        <div class="game-header">
+            <h1 class="game-title">
+                <span class="title-icon">🎯</span>
+                Number Guessing Game
+            </h1>
+            <p class="subtitle">Test your intuition! Guess the 3-digit number between 100-999</p>
+        </div>
+
+        <div class="game-intro">
+            <div class="intro-card">
+                <h3>🎮 How to Play</h3>
+                <ul class="game-rules">
+                    <li>I'll think of a random 3-digit number</li>
+                    <li>You have up to 10 attempts to guess it</li>
+                    <li>I'll tell you if your guess is too high or too low</li>
+                    <li>Try to guess in as few attempts as possible!</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="game-form">
+            <form method="POST" class="start-form">
+                <div class="form-group">
+                    <label for="name" class="form-label">Enter your name to start</label>
+                    <input type="text" 
+                           id="name" 
+                           name="name" 
+                           placeholder="Your name here..." 
+                           required 
+                           class="name-input"
+                           autocomplete="off">
+                </div>
+                <button type="submit" class="btn btn-primary start-btn">
+                    <span class="btn-text">Start New Game</span>
+                    <span class="btn-icon">🚀</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value">3</div>
+                <div class="stat-label">Digits</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">10</div>
+                <div class="stat-label">Max Attempts</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">100-999</div>
+                <div class="stat-label">Range</div>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="{{ url_for('scores') }}" class="btn btn-secondary">
+                <span class="btn-text">View Leaderboard</span>
+                <span class="btn-icon">🏆</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const nameInput = document.getElementById('name');
+            const startBtn = document.querySelector('.start-btn');
+            
+            // Focus animation
+            nameInput.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+            });
+            
+            nameInput.addEventListener('blur', function() {
+                if (!this.value) {
+                    this.parentElement.classList.remove('focused');
+                }
+            });
+            
+            // Button hover effect
+            startBtn.addEventListener('mouseenter', function() {
+                this.classList.add('pulse');
+            });
+            
+            startBtn.addEventListener('mouseleave', function() {
+                this.classList.remove('pulse');
+            });
+        });
+    </script>
 </body>
 </html>

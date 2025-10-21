@@ -1,29 +1,161 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Game Scores</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 Leaderboard - Number Guessing Game</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="container">
-    <h2>🏆 Game History</h2>
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Attempts</th>
-            <th>Result</th>
-        </tr>
-        {% for row in data %}
-        <tr>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[2] }}</td>
-            <td>{{ row[3] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <a href="{{ url_for('index') }}">Back to Game</a>
-</div>
+    <div class="container">
+        <div class="game-header">
+            <h1 class="game-title">
+                <span class="title-icon">🏆</span>
+                Leaderboard
+            </h1>
+            <p class="subtitle">See how players are performing in the Number Guessing Game</p>
+        </div>
+
+        {% if data %}
+            <div class="leaderboard">
+                <div class="leaderboard-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ data|length }}</div>
+                        <div class="stat-label">Total Games</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ data|selectattr('3', 'equalto', 'Win')|list|length }}</div>
+                        <div class="stat-label">Wins</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ data|selectattr('3', 'equalto', 'Lose')|list|length }}</div>
+                        <div class="stat-label">Losses</div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th class="rank-col">Rank</th>
+                                <th class="player-col">Player</th>
+                                <th class="attempts-col">Attempts</th>
+                                <th class="result-col">Result</th>
+                                <th class="performance-col">Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data %}
+                            <tr class="{% if row[3] == 'Win' %}winner-row{% endif %}">
+                                <td class="rank">
+                                    {% if loop.index == 1 and row[3] == 'Win' %}
+                                        <span class="rank-icon">🥇</span>
+                                    {% elif loop.index == 2 and row[3] == 'Win' %}
+                                        <span class="rank-icon">🥈</span>
+                                    {% elif loop.index == 3 and row[3] == 'Win' %}
+                                        <span class="rank-icon">🥉</span>
+                                    {% else %}
+                                        <span class="rank-number">{{ loop.index }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="player-name">
+                                    <span class="player-avatar">{{ row[1][0].upper() }}</span>
+                                    {{ row[1] }}
+                                </td>
+                                <td class="attempts">
+                                    <span class="attempts-badge">{{ row[2] }}</span>
+                                </td>
+                                <td class="result">
+                                    <span class="result-badge {{ 'success' if row[3] == 'Win' else 'error' }}">
+                                        {{ row[3] }}
+                                    </span>
+                                </td>
+                                <td class="performance">
+                                    {% if row[3] == 'Win' %}
+                                        {% if row[2] <= 3 %}
+                                            <span class="performance excellent">Excellent</span>
+                                        {% elif row[2] <= 6 %}
+                                            <span class="performance good">Good</span>
+                                        {% elif row[2] <= 8 %}
+                                            <span class="performance average">Average</span>
+                                        {% else %}
+                                            <span class="performance poor">Keep Trying</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="performance poor">Try Again</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🎯</div>
+                <h3>No Games Yet</h3>
+                <p>Be the first to play and appear on the leaderboard!</p>
+            </div>
+        {% endif %}
+
+        <div class="action-buttons">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <span class="btn-text">Start New Game</span>
+                <span class="btn-icon">🎯</span>
+            </a>
+        </div>
+
+        <div class="leaderboard-info">
+            <h3>📊 How Performance is Rated</h3>
+            <div class="performance-guide">
+                <div class="performance-item">
+                    <span class="performance excellent">Excellent</span>
+                    <span class="performance-desc">1-3 attempts</span>
+                </div>
+                <div class="performance-item">
+                    <span class="performance good">Good</span>
+                    <span class="performance-desc">4-6 attempts</span>
+                </div>
+                <div class="performance-item">
+                    <span class="performance average">Average</span>
+                    <span class="performance-desc">7-8 attempts</span>
+                </div>
+                <div class="performance-item">
+                    <span class="performance poor">Keep Trying</span>
+                    <span class="performance-desc">9+ attempts</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add entrance animation to table rows
+            const rows = document.querySelectorAll('.leaderboard-table tbody tr');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(-20px)';
+                
+                setTimeout(() => {
+                    row.style.transition = 'all 0.3s ease-out';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateX(0)';
+                }, index * 50);
+            });
+            
+            // Add hover effects to table rows
+            rows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(5px)';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            });
+        });
+    </script>
 </body>
 </html>

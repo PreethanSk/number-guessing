@@ -1,23 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Guess the Number</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Guessing Game - {{ session['name'] }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="container">
-    <h2>Welcome, {{ session['name'] }}!</h2>
-    <p>Guess the 3-digit number (100–999)</p>
+    <div class="container">
+        <div class="game-header">
+            <h1 class="game-title">
+                <span class="title-icon">🎯</span>
+                Guessing Game
+            </h1>
+            <p class="player-welcome">Welcome back, <strong>{{ session['name'] }}</strong>! 👋</p>
+        </div>
 
-    <form method="POST">
-        <input type="number" name="guess" min="100" max="999" required>
-        <button type="submit">Submit Guess</button>
-    </form>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value">{{ attempts }}</div>
+                <div class="stat-label">Attempts</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ 10 - attempts }}</div>
+                <div class="stat-label">Remaining</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">100-999</div>
+                <div class="stat-label">Range</div>
+            </div>
+        </div>
 
-    {% if message %}
-        <p class="message">{{ message }}</p>
-    {% endif %}
-    <p>Attempts: {{ attempts }}</p>
-</div>
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ (attempts / 10) * 100 }}%"></div>
+            </div>
+            <div class="progress-text">{{ attempts }}/10 attempts used</div>
+        </div>
+
+        <div class="game-form">
+            <form method="POST" class="guess-form">
+                <div class="form-group">
+                    <label for="guess" class="form-label">Enter your guess</label>
+                    <input type="number" 
+                           id="guess" 
+                           name="guess" 
+                           min="100" 
+                           max="999" 
+                           placeholder="Enter a number between 100-999"
+                           required 
+                           class="guess-input"
+                           autocomplete="off"
+                           autofocus>
+                </div>
+                <button type="submit" class="btn btn-primary submit-guess">
+                    <span class="btn-text">Submit Guess</span>
+                    <span class="btn-icon">🎯</span>
+                </button>
+            </form>
+        </div>
+
+        {% if message %}
+            <div class="message {{ 'error' if 'low' in message or 'high' in message else 'info' }}">
+                <div class="message-icon">
+                    {% if 'low' in message %}
+                        ⬇️
+                    {% elif 'high' in message %}
+                        ⬆️
+                    {% else %}
+                        ℹ️
+                    {% endif %}
+                </div>
+                <div class="message-text">{{ message }}</div>
+            </div>
+        {% endif %}
+
+        <!-- Game Hints -->
+        <div class="game-hints">
+            <h3>💡 Hints</h3>
+            <ul class="hints-list">
+                <li>Think about the middle of the range first</li>
+                <li>Use the feedback to narrow down your search</li>
+                <li>Remember: you have {{ 10 - attempts }} attempts left!</li>
+            </ul>
+        </div>
+
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                <span class="btn-text">New Game</span>
+                <span class="btn-icon">🔄</span>
+            </a>
+            <a href="{{ url_for('scores') }}" class="btn btn-secondary">
+                <span class="btn-text">Leaderboard</span>
+                <span class="btn-icon">🏆</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const guessInput = document.getElementById('guess');
+            const submitBtn = document.querySelector('.submit-guess');
+            
+            // Auto-focus and select text
+            guessInput.focus();
+            guessInput.select();
+            
+            // Real-time validation
+            guessInput.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (value < 100 || value > 999) {
+                    this.classList.add('invalid');
+                } else {
+                    this.classList.remove('invalid');
+                }
+            });
+            
+            // Submit button state
+            guessInput.addEventListener('input', function() {
+                if (this.value && parseInt(this.value) >= 100 && parseInt(this.value) <= 999) {
+                    submitBtn.classList.add('ready');
+                } else {
+                    submitBtn.classList.remove('ready');
+                }
+            });
+            
+            // Enter key to submit
+            guessInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && this.value && parseInt(this.value) >= 100 && parseInt(this.value) <= 999) {
+                    submitBtn.click();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,21 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Game Result</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Game Result - {{ name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="container">
-    {% if status == 'win' %}
-        <h2>🎉 Congratulations {{ name }}! You guessed it!</h2>
-        <p>The number was {{ number }}.</p>
-        <p>Total attempts: {{ attempts }}</p>
-    {% else %}
-        <h2>😢 Sorry {{ name }}, you lost!</h2>
-        <p>The number was {{ number }}.</p>
-    {% endif %}
-    <a href="{{ url_for('index') }}">Play Again</a>
-    <a href="{{ url_for('scores') }}">View Scores</a>
-</div>
+    <div class="container">
+        {% if status == 'win' %}
+            <div class="result-container win-result">
+                <div class="celebration">
+                    <div class="confetti"></div>
+                    <div class="confetti"></div>
+                    <div class="confetti"></div>
+                    <div class="confetti"></div>
+                    <div class="confetti"></div>
+                </div>
+                
+                <div class="result-header">
+                    <h1 class="result-title">
+                        <span class="celebration-emoji">🎉</span>
+                        Congratulations!
+                    </h1>
+                    <p class="player-name">{{ name }}</p>
+                </div>
+
+                <div class="result-details">
+                    <div class="result-card">
+                        <div class="result-icon">🎯</div>
+                        <div class="result-info">
+                            <h3>You guessed it!</h3>
+                            <p class="secret-number">The number was <strong>{{ number }}</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="performance-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-content">
+                                <div class="stat-value">{{ attempts }}</div>
+                                <div class="stat-label">Attempts Used</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-content">
+                                <div class="stat-value performance-{{ 'excellent' if attempts <= 3 else 'good' if attempts <= 6 else 'average' if attempts <= 8 else 'poor' }}">{{ 'Excellent' if attempts <= 3 else 'Good' if attempts <= 6 else 'Average' if attempts <= 8 else 'Keep Trying' }}</div>
+                                <div class="stat-label">Performance</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="result-container lose-result">
+                <div class="result-header">
+                    <h1 class="result-title">
+                        <span class="celebration-emoji">😢</span>
+                        Game Over
+                    </h1>
+                    <p class="player-name">{{ name }}</p>
+                </div>
+
+                <div class="result-details">
+                    <div class="result-card">
+                        <div class="result-icon">🔍</div>
+                        <div class="result-info">
+                            <h3>Better luck next time!</h3>
+                            <p class="secret-number">The number was <strong>{{ number }}</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="performance-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-content">
+                                <div class="stat-value">{{ attempts }}</div>
+                                <div class="stat-label">Attempts Used</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">💪</div>
+                            <div class="stat-content">
+                                <div class="stat-value">Try Again</div>
+                                <div class="stat-label">Keep Going!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="action-buttons">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <span class="btn-text">Play Again</span>
+                <span class="btn-icon">🔄</span>
+            </a>
+            <a href="{{ url_for('scores') }}" class="btn btn-secondary">
+                <span class="btn-text">View Leaderboard</span>
+                <span class="btn-icon">🏆</span>
+            </a>
+        </div>
+
+        <div class="game-tips">
+            <h3>💡 Tips for Next Time</h3>
+            <ul class="tips-list">
+                <li>Start with the middle number (550) to divide the range</li>
+                <li>Use binary search strategy for faster results</li>
+                <li>Keep track of your previous guesses</li>
+                <li>Don't give up - practice makes perfect!</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add celebration animation for wins
+            {% if status == 'win' %}
+                const confetti = document.querySelectorAll('.confetti');
+                confetti.forEach((piece, index) => {
+                    piece.style.animationDelay = `${index * 0.1}s`;
+                });
+                
+                // Add success sound effect (if supported)
+                try {
+                    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBz2BzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBS13yO/eizEIHWq+8+OWT');
+                    audio.volume = 0.3;
+                    audio.play().catch(() => {}); // Ignore errors if audio not supported
+                } catch (e) {}
+            {% endif %}
+            
+            // Add entrance animation
+            const container = document.querySelector('.container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.6s ease-out';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
 </body>
 </html>
