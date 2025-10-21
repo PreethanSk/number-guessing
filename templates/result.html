@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    {% if status == 'win' %}
+        <h2>🎉 Congratulations {{ name }}! You guessed it!</h2>
+        <p>The number was {{ number }}.</p>
+        <p>Total attempts: {{ attempts }}</p>
+    {% else %}
+        <h2>😢 Sorry {{ name }}, you lost!</h2>
+        <p>The number was {{ number }}.</p>
+    {% endif %}
+    <a href="{{ url_for('index') }}">Play Again</a>
+    <a href="{{ url_for('scores') }}">View Scores</a>
+</div>
+</body>
+</html>

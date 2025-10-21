@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Guess the Number</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h2>Welcome, {{ session['name'] }}!</h2>
+    <p>Guess the 3-digit number (100–999)</p>
+
+    <form method="POST">
+        <input type="number" name="guess" min="100" max="999" required>
+        <button type="submit">Submit Guess</button>
+    </form>
+
+    {% if message %}
+        <p class="message">{{ message }}</p>
+    {% endif %}
+    <p>Attempts: {{ attempts }}</p>
+</div>
+</body>
+</html>
